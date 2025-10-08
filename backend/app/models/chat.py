@@ -13,4 +13,12 @@ class Chat(Base):
     user1 = relationship("User", foreign_keys=[user_id1])
     user2 = relationship("User", foreign_keys=[user_id2])
 
+    @property
+    def username1(self):
+        return self.user1.username if self.user1 else None
+
+    @property
+    def username2(self):
+        return self.user2.username if self.user2 else None
+
     messages = relationship("Message", back_populates="chat")
