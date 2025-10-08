@@ -1,5 +1,5 @@
-from .database import Base, engine
-from .models import User, Message, Chat, FileLink
+from .core import Base, engine
+from ..models import User, Message, Chat, FileLink
 
 # Create Tables
 def init_db():

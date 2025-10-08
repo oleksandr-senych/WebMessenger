@@ -1,6 +1,6 @@
 from sqlalchemy import Column, Integer, ForeignKey
 from sqlalchemy.orm import relationship
-from app.database import Base
+from app.database.core import Base
 from .user import User
 
 class Chat(Base):
