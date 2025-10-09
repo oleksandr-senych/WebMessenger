@@ -3,7 +3,7 @@ from fastapi.testclient import TestClient
 from app.main import app
 from app.database.core import SessionLocal, engine, Base
 from app.models import User
-from app.database.init_db import init_db
+
 
 
 
@@ -11,20 +11,13 @@ from app.database.init_db import init_db
 
 client = TestClient(app)
 
-def cleanup_user(username: str):
-    db = SessionLocal()
-    try:
-        db.query(User).filter(User.username == username).delete()
-        db.commit()
-    finally:
-        db.close()
+
 
 
 @pytest.mark.crud
-def test_create_user():
+def test_create_user(test_db):
     test_username = "apitestuser"
     test_email = "apitest@example.com"
-    cleanup_user(test_username)
     response = client.post(
         "api/users/",
         json={
@@ -43,7 +36,7 @@ def test_create_user():
 
 
 @pytest.mark.crud
-def test_read_users():
+def test_read_users(test_db):
     response = client.get("api/users/")
     assert response.status_code == 200
     users = response.json()
@@ -51,11 +44,10 @@ def test_read_users():
 
 
 @pytest.mark.crud
-def test_get_user_by_username():
+def test_get_user_by_username(test_db):
     test_username = "apitestuser_find"
     test_email = "apitest_find@example.com"
 
-    cleanup_user(test_username)
 
     # Create user first
     response = client.post(
@@ -78,12 +70,11 @@ def test_get_user_by_username():
     assert "id" in data
 
 @pytest.mark.crud
-def test_delete_user():
+def test_delete_user(test_db):
     test_username = "apitestuser_delete"
     test_email = "apitest_delete@example.com"
 
     
-    cleanup_user(test_username)
 
     # Create user
     response = client.post(

@@ -1,11 +1,13 @@
+from typing import Optional
 from pydantic import BaseModel, ConfigDict
 
 class FileLinkBase(BaseModel):
     message_id: int
     link: str
 
-class FileLinkCreate(FileLinkBase):
-    pass
+class FileLinkCreate(BaseModel):
+    link: str
+    message_id: Optional[int] = None
 
 
 class FileLinkRead(FileLinkBase):

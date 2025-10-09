@@ -52,13 +52,13 @@ def get_all_messages(chat_id: int, db: Session = Depends(get_db)):
     return sorted(chat.messages, key=lambda m: m.created_at)
 
 # Updates message text
-@router.put("/{message_id}", response_model=MessageRead)
+@router.put("/{message_id}", response_model=MessageRead, status_code=status.HTTP_200_OK)
 def update_message(message_id: int, new_text: MessageUpdate, db: Session = Depends(get_db)):
     message = db.get(Message, message_id)
     if not message:
         raise HTTPException(status_code=404, detail="Message not found")
 
-    message.text= new_text
+    message.text= new_text.text
     db.commit()
     db.refresh(message)
     return message
