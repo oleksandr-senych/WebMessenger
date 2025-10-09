@@ -5,10 +5,9 @@ class ChatBase(BaseModel):
     user_id2: int
 
 
-
+#first username is known by jwt authentication
 class ChatCreate(BaseModel):
-    username1: str
-    username2: str
+    other_username: str
 
 class ChatRead(ChatBase):
     id: int

@@ -1,6 +1,10 @@
+from fastapi.testclient import TestClient
 import pytest
 from app.database.core import SessionLocal, Base, engine
 from app.models import User, Chat, Message, FileLink
+from app.main import app
+
+client = TestClient(app)
 
 # Creates all tables at the start of tests. Deletes all tables after the tests.
 @pytest.fixture(scope="module")
@@ -20,16 +24,36 @@ def db_session(test_db):
 
 @pytest.fixture
 def create_user(db_session):
-    def _create(username, email):
-        user = User(username=username, email=email, hashed_password="secret")
-        try:
-            #if user doesnt exist, add user
-            db_session.add(user)
-            db_session.commit()
-            db_session.refresh(user)
-        finally:
-            return user
+    def _create(username : str, email : str, password : str = "secret123"):
+        response = client.post(
+            "/api/auth/register",
+            json={
+                "username": username,
+                "email": email,
+                "password": password
+            }
+        )
+        assert response.status_code in (200, 201), f"Failed to create user: {response.text}"
+        return username, email
     return _create
+
+@pytest.fixture
+def login_user(db_session):
+    def _login(username : str, password : str = "secret123"):
+        response = client.post(
+            "/api/auth/login",
+            data={
+                "username": username,
+                "password": password
+            }
+        )
+        # if login successful, return header
+        if response.status_code == 200:
+            token = response.json()["access_token"]
+            return {"Authorization": f"Bearer {token}"}
+        else :
+            return response
+    return _login
 
 @pytest.fixture
 def create_chat(db_session, create_user):
