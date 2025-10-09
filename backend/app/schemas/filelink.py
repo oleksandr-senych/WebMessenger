@@ -7,6 +7,7 @@ class FileLinkBase(BaseModel):
 class FileLinkCreate(FileLinkBase):
     pass
 
+
 class FileLinkRead(FileLinkBase):
     id: int
     model_config = ConfigDict(from_attributes=True)

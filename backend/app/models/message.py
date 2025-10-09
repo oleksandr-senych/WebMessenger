@@ -13,8 +13,8 @@ class Message(Base):
     chat_id = Column(Integer, ForeignKey("chats.id"), nullable=False)
     user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
     text = Column(String, nullable=True)
-    created_at = Column(DateTime(timezone=True), server_default=func.now())
+    created_at = Column(DateTime(timezone=True), index=True, server_default=func.now())
 
     chat = relationship("Chat", back_populates="messages")
     user = relationship("User", back_populates="messages")
-    filelinks = relationship("FileLink", back_populates="message")
+    filelinks = relationship("FileLink", back_populates="message", cascade="all, delete-orphan")
