@@ -16,10 +16,12 @@ async def lifespan(app: FastAPI):
     # Shutdown 
     print("Shutting down...")
 
-# Allow frontend (e.g. Vite on localhost:5173)
+# Allow frontend 
 origins = [
     "http://localhost:5173",
-    "http://127.0.0.1:5173"
+    "http://127.0.0.1:5173",
+    "http://localhost:3000",
+    "http://localhost:8080",
 ]
 
 
