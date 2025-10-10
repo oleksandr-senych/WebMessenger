@@ -6,10 +6,13 @@ import Login from "./pages/Login";
 import { AuthProvider } from "./context/AuthContext";
 import ChatsPage from "./pages/ChatsPage";
 import MessagesPage from "./pages/MessagesPage";
+import "./index.css";
+import { Toaster } from "react-hot-toast";
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
     <AuthProvider>
+      <Toaster position="top-center" reverseOrder={false} />
       <BrowserRouter>
         <Routes>
           <Route path="/register" element={<Register />} />

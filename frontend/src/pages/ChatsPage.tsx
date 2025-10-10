@@ -53,7 +53,7 @@ export default function ChatsPage() {
 
   return (
     <div>
-      <h1>Your Chats</h1>
+      <h1 className="bg-red-200">Your Chats</h1>
       <button onClick={handleCreateChat}>Create Chat</button>
 
       {loading && <p>Loading...</p>}

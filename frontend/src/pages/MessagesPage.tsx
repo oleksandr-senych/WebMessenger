@@ -1,11 +1,11 @@
 import { useEffect, useState } from "react";
-import { useLocation, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import { getMessages, createMessage, type Message } from "../api/messages";
 import { useAuth } from "../context/AuthContext";
 
 export default function MessagesPage() {
   const { chatId } = useParams<{ chatId: string }>();
-  const { username, token } = useAuth();
+  const { token } = useAuth();
   const [messages, setMessages] = useState<Message[]>([]);
   const [newMessage, setNewMessage] = useState("");
   const [loading, setLoading] = useState(true);
@@ -43,7 +43,7 @@ export default function MessagesPage() {
   if (loading) return <div>Loading messages...</div>;
   if (error) return <div>Error: {error}</div>;
 
-  
+
   return (
     <div>
       <h2>Chat Messages</h2>
