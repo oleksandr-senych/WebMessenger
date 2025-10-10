@@ -1,22 +1,35 @@
+import os
 from fastapi.testclient import TestClient
 import pytest
-from app.database.core import SessionLocal, Base, engine
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker
+from app.database.core import Base
 from app.models import User, Chat, Message, FileLink
 from app.main import app
 
 client = TestClient(app)
 
+TEST_DATABASE_URL = (
+    f"postgresql://{os.getenv('DB_USER')}:"
+    f"{os.getenv('DB_PASSWORD')}@"
+    f"{os.getenv('DB_HOST')}:{os.getenv('DB_PORT')}/"
+    f"{os.getenv('DB_TEST_NAME')}"
+)
+
+test_engine = create_engine(TEST_DATABASE_URL)
+TestSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=test_engine)
+
 # Creates all tables at the start of tests. Deletes all tables after the tests.
 @pytest.fixture(scope="module")
 def test_db():
-    Base.metadata.create_all(bind=engine)
+    Base.metadata.create_all(bind=test_engine)
     yield
-    Base.metadata.drop_all(bind=engine)
+    Base.metadata.drop_all(bind=test_engine)
 
 # Creates db session
 @pytest.fixture
 def db_session(test_db):
-    session = SessionLocal()
+    session = TestSessionLocal()
     try:
         yield session
     finally:

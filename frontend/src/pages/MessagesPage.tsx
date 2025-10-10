@@ -10,10 +10,8 @@ export default function MessagesPage() {
   const {username, token } = useAuth();
   const [messages, setMessages] = useState<Message[]>([]);
   const [newMessage, setNewMessage] = useState("");
-  const [loading, setLoading] = useState(true);
 
   const fetchMessages = async () => {
-    setLoading(true);
     try {
       if (!chatId) throw new Error("No chat ID provided");
       const data = await getMessages(Number(chatId), token);
@@ -21,7 +19,6 @@ export default function MessagesPage() {
     } catch (err: any) {
       toast.error(err.message);
     } finally {
-      setLoading(false);
     }
   };
 
