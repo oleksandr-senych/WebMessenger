@@ -27,7 +27,7 @@ def create_messagecreate_message(
     # Create message
     new_message = Message(
         chat_id=message_create.chat_id,
-        user_id=message_create.user_id,
+        user = current_user,
         text=message_create.text
     )
 

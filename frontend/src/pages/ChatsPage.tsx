@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import { createChat, getChats } from "../api/chats";
 
 interface Chat {
   id: number;
@@ -29,17 +30,7 @@ export default function ChatsPage() {
   const fetchChats = async () => {
     setLoading(true);
     try {
-      const res = await fetch("http://localhost:8000/api/chats/", {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-
-      if (!res.ok) {
-        throw new Error(`Error ${res.status}: ${res.statusText}`);
-      }
-
-      const data = await res.json();
+      const data = await getChats(token);
       setChats(data);
     } catch (err: any) {
       setError(err.message);
@@ -53,21 +44,8 @@ export default function ChatsPage() {
     if (!otherUsername) return;
 
     try {
-      const res = await fetch("http://localhost:8000/api/chats/", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({ other_username: otherUsername }),
-      });
-
-      if (!res.ok) {
-        const errData = await res.json();
-        throw new Error(errData.detail || "Failed to create chat");
-      }
-
-      await fetchChats();
+      await createChat({ other_username: otherUsername }, token);
+      await fetchChats(); // Refresh chats list
     } catch (err: any) {
       setError(err.message);
     }
@@ -82,10 +60,12 @@ export default function ChatsPage() {
       {error && <p style={{ color: "red" }}>{error}</p>}
 
       <ul>
-        {chats.map((chat) => (
-          <li key={chat.id}>
+        {chats.map((chat)  => (
+          <Link key={chat.id}
+            to={`/chats/${chat.id}`}
+          >
             {chat.username1 === username ? chat.username2 : chat.username1}
-          </li>
+          </Link>
         ))}
       </ul>
     </div>

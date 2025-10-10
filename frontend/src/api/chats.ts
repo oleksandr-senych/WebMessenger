@@ -1,5 +1,6 @@
-const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:8000/api";
 
+
+const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:8000/api";
 export interface Chat {
   id: number;
   user_id1: number;
@@ -9,17 +10,16 @@ export interface Chat {
 }
 
 export interface CreateChatPayload {
-  username2: string; // the user to start chat with
+  other_username: string; // the user to start chat with
 }
 
 /**
  * Fetch all chats for the current logged-in user
  */
-export async function getChats(): Promise<Chat[]> {
-  const token = localStorage.getItem("token");
+export async function getChats(token:string|null): Promise<Chat[]> {
   if (!token) throw new Error("Not authenticated");
 
-  const response = await fetch(`${API_BASE_URL}/chats/me`, {
+  const response = await fetch(`${API_BASE_URL}/chats/`, {
     headers: {
       Authorization: `Bearer ${token}`,
     },
@@ -36,8 +36,7 @@ export async function getChats(): Promise<Chat[]> {
 /**
  * Create a new chat with another user
  */
-export async function createChat(payload: CreateChatPayload): Promise<Chat> {
-  const token = localStorage.getItem("token");
+export async function createChat(payload: CreateChatPayload,token:string|null): Promise<Chat> {
   if (!token) throw new Error("Not authenticated");
 
   const response = await fetch(`${API_BASE_URL}/chats/`, {

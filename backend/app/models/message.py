@@ -17,4 +17,9 @@ class Message(Base):
 
     chat = relationship("Chat", back_populates="messages")
     user = relationship("User", back_populates="messages")
+
+    @property
+    def username(self):
+        return self.user.username if self.user else None
+    
     filelinks = relationship("FileLink", back_populates="message", cascade="all, delete-orphan")
