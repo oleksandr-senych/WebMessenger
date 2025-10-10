@@ -16,9 +16,11 @@ export async function login(username: string, password: string) {
 
   // Save JWT for later use
   localStorage.setItem("token", response.data.access_token);
+  localStorage.setItem("username", username);
   return response.data;
 }
 
 export function logout() {
   localStorage.removeItem("token");
+  localStorage.removeItem("username");
 }

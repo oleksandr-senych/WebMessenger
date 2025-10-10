@@ -19,7 +19,7 @@ def create_chat(chat_create: ChatCreate,
                 status_code=status.HTTP_201_CREATED
 ):
 
-    other_user = db.query(User).filter(User.username == chat_create.username).first()
+    other_user = db.query(User).filter(User.username == chat_create.other_username).first()
 
     if not other_user:
         raise HTTPException(status_code=404, detail="User not found")
