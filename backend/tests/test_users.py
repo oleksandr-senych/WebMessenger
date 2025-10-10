@@ -75,7 +75,7 @@ def test_user_login(test_db):
 
 @pytest.mark.crud
 def test_delete_user(create_user,login_user,test_db):
-    username, email = create_user("apitestuser_delete", "apitest_delete@example.com")
+    username= create_user("apitestuser_delete")
 
     header = login_user(username)
 

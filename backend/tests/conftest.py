@@ -3,11 +3,11 @@ from fastapi.testclient import TestClient
 import pytest
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
-from app.database.core import Base
+from app.database.core import Base, get_db
 from app.models import User, Chat, Message, FileLink
 from app.main import app
 
-client = TestClient(app)
+
 
 TEST_DATABASE_URL = (
     f"postgresql://{os.getenv('DB_USER')}:"
@@ -18,6 +18,7 @@ TEST_DATABASE_URL = (
 
 test_engine = create_engine(TEST_DATABASE_URL)
 TestSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=test_engine)
+
 
 # Creates all tables at the start of tests. Deletes all tables after the tests.
 @pytest.fixture(scope="module")
@@ -34,20 +35,32 @@ def db_session(test_db):
         yield session
     finally:
         session.close()
+# --- FASTAPI OVERRIDE ---
+def override_get_db():
+    """Override FastAPI's DB dependency for testing."""
+    db = TestSessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
+        
+                
+app.dependency_overrides[get_db] = override_get_db
+client = TestClient(app)
 
 @pytest.fixture
 def create_user(db_session):
-    def _create(username : str, email : str, password : str = "secret123"):
+    def _create(username : str, password : str = "secret123"):
         response = client.post(
             "/api/auth/register",
             json={
                 "username": username,
-                "email": email,
+                "email": f"{username}@example.com",
                 "password": password
             }
         )
         assert response.status_code in (200, 201), f"Failed to create user: {response.text}"
-        return username, email
+        return username
     return _create
 
 @pytest.fixture
@@ -71,8 +84,8 @@ def login_user(db_session):
 @pytest.fixture
 def create_chat(db_session, create_user):
     def _create(username1, username2):
-        user1 = create_user(username1, f"{username1}@example.com")
-        user2 = create_user(username2, f"{username2}@example.com")
+        user1 = create_user(username1)
+        user2 = create_user(username2)
 
         chat = Chat(user_id1=user1.id, user_id2=user2.id)
         try:

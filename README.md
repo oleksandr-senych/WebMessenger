@@ -53,7 +53,7 @@ Then you can ran the api by using uvicorn:
 
 `uvicorn app.main:app`
 
-You can run tests using this command:
+You can run tests using this command(in this commit they do not work properly due to being written before JWT):
 
 `pytest`
 
