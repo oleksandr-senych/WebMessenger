@@ -1,35 +1,48 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "./context/AuthContext";
+import NavButton from "./components/NavButton";
 
-function App() {
-  const [count, setCount] = useState(0)
+export default function App() {
+  const { token } = useAuth();
+  const navigate = useNavigate();
 
+  const username = localStorage.getItem("username");
+
+  useEffect(() => {
+    // optional: if user not logged in, you can choose to redirect to login
+  }, [token]);
+
+  const handleChatsClick = () => {
+    if (!token) {
+      navigate("/login");
+    } else {
+      navigate("/chats");
+    }
+  };
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
+    <div className="min-h-screen flex flex-col items-center justify-center bg-gray-100 text-gray-800">
+      <div className="bg-white shadow-md rounded-xl p-8 max-w-md text-center border border-gray-200">
+        <h1 className="text-3xl font-bold text-blue-600 mb-4">
+          Welcome, {token ? username : "Guest"}!
+        </h1>
+        <p className="text-gray-600 mb-6">
+          {token
+            ? "You are logged in."
+            : "Please register or log in to start chatting."}
         </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
-}
 
-export default App
+        <div className="flex flex-col gap-3">
+          <NavButton label="Register" to="/register" />
+          <NavButton label="Login" to="/login" />
+          <button
+            onClick={handleChatsClick}
+            className="px-4 py-2 rounded-md text-white font-medium bg-blue-500 hover:bg-blue-600 focus:ring-2 focus:ring-blue-400 transition"
+          >
+            Chats
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}

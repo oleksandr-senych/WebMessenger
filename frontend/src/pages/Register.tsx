@@ -4,11 +4,12 @@ import FormContainer from "../components/FormContainer";
 import AuthForm from "../components/AuthForm";
 import AuthButton from "../components/AuthButton";
 import toast from "react-hot-toast";
+import { useNavigate } from "react-router-dom";
 
 export default function Register() {
   const [form, setForm] = useState({ username: "", email: "", password: "" });
   const [msg, setMsg] = useState("");
-
+  const navigate = useNavigate()
   const handleChange = (name: string, value: string) => {
     setForm((prev) => ({ ...prev, [name]: value }));
   };
@@ -19,6 +20,7 @@ export default function Register() {
     try {
       const res = await register(form.username, form.email, form.password);
       toast.success(`User ${res.username} registered!`);
+      navigate("/chats");
     } catch (err: any) {
       // Extract proper message
       const detail = err.response?.data?.detail;

@@ -26,7 +26,8 @@ def register_user(user: UserCreate, db: Session = Depends(get_db)):
     db.add(user)
     db.commit()
     db.refresh(user)
-    return {"msg": "User created", "username": user.username, "email" : user.email}
+    token = create_access_token({"sub": user.username})
+    return {"msg": "User created", "username": user.username, "email" : user.email,"access_token": token}
 
 @router.post("/login")
 def login(form: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):

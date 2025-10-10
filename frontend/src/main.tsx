@@ -8,6 +8,7 @@ import ChatsPage from "./pages/ChatsPage";
 import MessagesPage from "./pages/MessagesPage";
 import "./index.css";
 import { Toaster } from "react-hot-toast";
+import App from "./App";
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
@@ -15,6 +16,7 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
       <Toaster position="top-center" reverseOrder={false} />
       <BrowserRouter>
         <Routes>
+          <Route path="/" element={<App />} />
           <Route path="/register" element={<Register />} />
           <Route path="/login" element={<Login />} />
           <Route path="/chats" element={<ChatsPage />} />

@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { createChat, getChats } from "../api/chats";
 import toast from "react-hot-toast";
@@ -46,19 +46,27 @@ export default function ChatsPage() {
     const otherUsername = prompt("Enter username of the person to chat with:");
     if (!otherUsername) return;
 
-    await toast.promise(
-      createChat({ other_username: otherUsername }, token).then(() =>
-        fetchChats()
-      ),
-      {
-        loading: "Creating chat...",
-        success: `Chat with ${otherUsername} created!`,
-        error: (err) =>
-          typeof err === "string"
-            ? err
-            : err?.message || "Failed to create chat",
-      }
-    );
+    await toast
+      .promise(
+        createChat({ other_username: otherUsername }, token).then((newChat) =>
+          fetchChats().then(() => newChat)
+        ),
+        {
+          loading: "Creating chat...",
+          success: `Chat with ${otherUsername} created!`,
+          error: (err) =>
+            typeof err === "string"
+              ? err
+              : err?.message || "Failed to create chat",
+        }
+      )
+      .then((newChat) => {
+        if (newChat && newChat.id) {
+          navigate(
+            `/chats/${newChat.id}?username1=${newChat.username1}&username2=${newChat.username2}`
+          );
+        }
+      });
   };
 
   return (

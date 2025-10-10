@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { login } from "../api/auth";
 import { useAuth } from "../context/AuthContext";
+import { useNavigate } from "react-router-dom";
 import FormContainer from "../components/FormContainer";
 import AuthForm from "../components/AuthForm";
 import AuthButton from "../components/AuthButton";
@@ -10,6 +11,8 @@ export default function Login() {
   const [form, setForm] = useState({ username: "", password: "" });
   const [msg, setMsg] = useState("");
   const { setToken, setUsername } = useAuth();
+  const navigate = useNavigate();
+
 
   const handleChange = (name: string, value: string) => {
     setForm((prev) => ({ ...prev, [name]: value }));
@@ -28,6 +31,7 @@ export default function Login() {
       localStorage.setItem("token", res.access_token);
       localStorage.setItem("username", form.username);
       toast.success("Login successful");
+      navigate("/chats");
     } catch (err: any) {
       toast.error(err.response?.data?.detail || "Login failed");
     }
