@@ -2,6 +2,9 @@ import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { createChat, getChats } from "../api/chats";
+import toast from "react-hot-toast";
+import CreateChatButton from "../components/CreateChatButton";
+import ChatEntry from "../components/ChatEntry";
 
 interface Chat {
   id: number;
@@ -15,7 +18,6 @@ export default function ChatsPage() {
   const { token, username } = useAuth();
   const [chats, setChats] = useState<Chat[]>([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -30,10 +32,11 @@ export default function ChatsPage() {
   const fetchChats = async () => {
     setLoading(true);
     try {
-      const data = await getChats(token);
-      setChats(data);
-    } catch (err: any) {
-      setError(err.message);
+      await toast.promise(getChats(token).then(setChats), {
+        loading: "Loading your chats...",
+        success: "Chats loaded!",
+        error: "Failed to fetch chats",
+      });
     } finally {
       setLoading(false);
     }
@@ -43,29 +46,33 @@ export default function ChatsPage() {
     const otherUsername = prompt("Enter username of the person to chat with:");
     if (!otherUsername) return;
 
-    try {
-      await createChat({ other_username: otherUsername }, token);
-      await fetchChats(); // Refresh chats list
-    } catch (err: any) {
-      setError(err.message);
-    }
+    await toast.promise(
+      createChat({ other_username: otherUsername }, token).then(() =>
+        fetchChats()
+      ),
+      {
+        loading: "Creating chat...",
+        success: `Chat with ${otherUsername} created!`,
+        error: (err) =>
+          typeof err === "string"
+            ? err
+            : err?.message || "Failed to create chat",
+      }
+    );
   };
 
   return (
-    <div>
-      <h1 className="bg-red-200">Your Chats</h1>
-      <button onClick={handleCreateChat}>Create Chat</button>
+    <div className="max-w-lg mx-auto mt-10 space-y-4">
+      <h1 className="text-2xl font-bold text-center mb-4">Your Chats</h1>
+      <CreateChatButton onClick={handleCreateChat} loading={loading} />
 
-      {loading && <p>Loading...</p>}
-      {error && <p style={{ color: "red" }}>{error}</p>}
-
-      <ul>
-        {chats.map((chat)  => (
-          <Link key={chat.id}
-            to={`/chats/${chat.id}`}
-          >
-            {chat.username1 === username ? chat.username2 : chat.username1}
-          </Link>
+      <ul className="space-y-2">
+        {chats.map((chat) => (
+          <ChatEntry
+            key={chat.id}
+            chatId={chat.id}
+            name={chat.username1 === username ? chat.username2 : chat.username1}
+          />
         ))}
       </ul>
     </div>

@@ -2,14 +2,15 @@ import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { getMessages, createMessage, type Message } from "../api/messages";
 import { useAuth } from "../context/AuthContext";
+import toast from "react-hot-toast";
+import MessageEntry from "../components/MessageEntry";
 
 export default function MessagesPage() {
   const { chatId } = useParams<{ chatId: string }>();
-  const { token } = useAuth();
+  const {username, token } = useAuth();
   const [messages, setMessages] = useState<Message[]>([]);
   const [newMessage, setNewMessage] = useState("");
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
 
   const fetchMessages = async () => {
     setLoading(true);
@@ -18,7 +19,7 @@ export default function MessagesPage() {
       const data = await getMessages(Number(chatId), token);
       setMessages(data);
     } catch (err: any) {
-      setError(err.message);
+      toast.error(err.message);
     } finally {
       setLoading(false);
     }
@@ -32,7 +33,7 @@ export default function MessagesPage() {
       setNewMessage("");
       await fetchMessages();
     } catch (err: any) {
-      setError(err.message);
+      toast.error(err.message);
     }
   };
 
@@ -40,35 +41,42 @@ export default function MessagesPage() {
     fetchMessages();
   }, [chatId]);
 
-  if (loading) return <div>Loading messages...</div>;
-  if (error) return <div>Error: {error}</div>;
-
-
   return (
-    <div>
-      <h2>Chat Messages</h2>
-      <div>
+    <div className="max-w-2xl mx-auto p-4">
+      <h2 className="text-2xl font-semibold text-gray-800 mb-4">
+        Chat Messages
+      </h2>
+
+      <div className="border border-gray-300 rounded-lg p-4 h-96 overflow-y-auto bg-white shadow-sm flex flex-col">
         {messages.length === 0 ? (
-          <div>No messages yet</div>
+          <div className="text-gray-500 text-center">No messages yet</div>
         ) : (
           messages.map((msg) => (
-            <div key={msg.id}>
-              <strong>{msg.username}:</strong>{" "}
-              {msg.text}
-              <div>{msg.created_at}</div>
-            </div>
+            <MessageEntry
+              key={msg.id}
+              username={msg.username}
+              text={msg.text}
+              createdAt={msg.created_at}
+              isOwn={msg.username === username}
+            />
           ))
         )}
       </div>
 
-      <div>
+      <div className="mt-4 flex gap-2">
         <input
           type="text"
           value={newMessage}
           onChange={(e) => setNewMessage(e.target.value)}
           placeholder="Type a message..."
+          className="flex-1 border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
         />
-        <button onClick={handleSendMessage}>Send</button>
+        <button
+          onClick={handleSendMessage}
+          className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
+        >
+          Send
+        </button>
       </div>
     </div>
   );

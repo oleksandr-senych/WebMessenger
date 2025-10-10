@@ -1,4 +1,4 @@
-import type { ChangeEvent, FormEvent } from "react";
+import type { FormEvent } from "react";
 
 interface Field {
   name: string;
